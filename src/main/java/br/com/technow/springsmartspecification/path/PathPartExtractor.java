@@ -49,7 +49,7 @@ public class PathPartExtractor {
     }
 
     public boolean isEmpty() {
-        return string.isEmpty();
+        return string == null || string.isEmpty();
     }
 
     public String getString() {

@@ -49,6 +49,9 @@ public class JpaExampleSpecification implements SmartSpecification<JpaExample> {
     @SmartSpecificationField(customMethod = "wantThisIdMethod")
     private Long wantThisId;
 
+    @SmartSpecificationField(path = "child.fullName", condition = "eq")
+    private String childName;
+
     @Override
     public Class<JpaExample> getDomainClass() {
         return JpaExample.class;

@@ -46,7 +46,7 @@ public class SmartSpecificationMetaFactory {
         PathPartExtractor pathPartExtractor = getPathPartExtrator(specification, rawField, fieldAnnotation);
         fieldMeta.setCondition(getCondition(pathPartExtractor, rawField, fieldAnnotation));
         fieldMeta.setCustomMethod(getCustomMethod(pathPartExtractor, rawField, fieldAnnotation));
-        validateFieldMeta(fieldMeta);
+        validateFieldMeta(specification, fieldMeta);
         return fieldMeta;
     }
 
@@ -66,11 +66,22 @@ public class SmartSpecificationMetaFactory {
         }
     }
 
-    private static void validateFieldMeta(SmartSpecificationFieldMeta fieldMeta) {
+    private static void validateFieldMeta(SmartSpecification<?> specification, SmartSpecificationFieldMeta fieldMeta) {
         if (fieldMeta.getCondition() != null && fieldMeta.getCustomMethod() != null) {
             throw new IllegalArgumentException(
                     "Field " + fieldMeta.getSpecificationField().getName()
                             + " can't have both condition and custom method");
+        }
+        if (!fieldMeta.getPath().isEmpty()) {
+            String fieldPath = PathUtils.join(fieldMeta.getPath(), ".");
+            try {
+                String fieldName = PathUtils.join(fieldMeta.getPath(), "");
+                ReflectionUtils.extractPath(specification.getDomainClass(), fieldName, false);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Field " + fieldMeta.getSpecificationField().getName() + " path " + fieldPath
+                                + " is not valid for class " + specification.getDomainClass().getName());
+            }
         }
     }
 
@@ -86,7 +97,7 @@ public class SmartSpecificationMetaFactory {
             SmartSpecificationField fieldAnnotation) {
         if (fieldAnnotation != null && !fieldAnnotation.condition().isEmpty()) {
             return fieldAnnotation.condition();
-        } else if (!pathPartExtractor.getString().isEmpty()) {
+        } else if (pathPartExtractor != null && !pathPartExtractor.isEmpty()) {
             if (fieldAnnotation == null || fieldAnnotation.customMethod().isEmpty()) {
                 return pathPartExtractor.getString();
             }

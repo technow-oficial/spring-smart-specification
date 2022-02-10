@@ -10,17 +10,24 @@ import org.springframework.beans.factory.annotation.Value;
 import br.com.technow.springsmartspecification.exception.ReflectionException;
 import br.com.technow.springsmartspecification.path.PathUtils;
 import br.com.technow.springsmartspecification.reflection.ReflectionUtils;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class ProjectionHandler<D, P> {
 
     private final Class<D> domainClass;
     private final Class<P> projectionClass;
     private List<ProjectionFieldMeta> fields;
 
+    protected ProjectionHandler(Class<D> domainClass, Class<P> projectionClass) {
+        this.domainClass = domainClass;
+        this.projectionClass = projectionClass;
+    }
+
+    private P create() {
+        return ReflectionUtils.newInstance(projectionClass);
+    }
+
     public P create(Object[] row) {
-        P projection = ReflectionUtils.newInstance(projectionClass);
+        P projection = create();
         for (ProjectionFieldMeta field : fields) {
             try {
                 field.getField().setAccessible(true);
@@ -66,6 +73,31 @@ public class ProjectionHandler<D, P> {
             projectionList.add(create(row));
         }
         return projectionList;
+    }
+
+    public P createByDomain(D domain) {
+        if (domain == null) {
+            return null;
+        }
+        P projection = create();
+        for (ProjectionFieldMeta field : fields) {
+            try {
+                Object value = ReflectionUtils.getFieldValue(domain, field.getPath());
+                field.getField().setAccessible(true);
+                field.getField().set(projection, value);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new ReflectionException(e);
+            }
+        }
+        return projection;
+    }
+
+    public List<P> createByDomain(List<D> domainList) {
+        List<P> result = new ArrayList<>();
+        for (D domain : domainList) {
+            result.add(createByDomain(domain));
+        }
+        return result;
     }
 
 }

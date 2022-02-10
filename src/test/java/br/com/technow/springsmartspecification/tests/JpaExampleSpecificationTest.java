@@ -122,7 +122,7 @@ public class JpaExampleSpecificationTest {
     }
 
     @Test
-    public void idLessThanEqual_ReturnsTwoFirstExamples_WhenSuccessful() {
+    public void idLessThanEqual_ReturnsFirstTwoExamples_WhenSuccessful() {
         JpaExampleSpecification specification = JpaExampleSpecification.builder()
                 .idLessThanEqual(2L)
                 .build();
@@ -264,7 +264,7 @@ public class JpaExampleSpecificationTest {
     }
 
     @Test
-    public void nameNotEqualsIgnoreCase_ReturnsTwoFirstExamples_WhenSuccessful() {
+    public void nameNotEqualsIgnoreCase_ReturnsFirstTwoExamples_WhenSuccessful() {
         JpaExampleSpecification specification = JpaExampleSpecification.builder()
                 .nameNotEqualsIgnoreCase("eX3")
                 .build();
@@ -290,7 +290,7 @@ public class JpaExampleSpecificationTest {
     }
 
     @Test
-    public void activeIsFalse_ReturnsEx1_WhenSuccessful() {
+    public void activeIsFalse_ReturnsEx2_WhenSuccessful() {
         JpaExampleSpecification specification = JpaExampleSpecification.builder()
                 .activeIsFalse(true)
                 .build();
@@ -351,7 +351,42 @@ public class JpaExampleSpecificationTest {
     public void childId_ReturnsEx1_WhenSuccessful() {
         JpaExampleSpecification specification = JpaExampleSpecification.builder()
                 .childId(1L)
+                .build();
+        JpaExampleProjection projection = jpaExampleRepository
+                .findOneProjectedBy(JpaExampleProjection.class, specification)
+                .get();
+        Assertions.assertThat(projection.getId())
+                .isEqualTo(1L);
+        Assertions.assertThat(projection.getName())
+                .isEqualTo("Ex1");
+        Assertions.assertThat(projection.getChildId())
+                .isEqualTo(1L);
+        Assertions.assertThat(projection.getChildName())
+                .isEqualTo("Alex");
+    }
+
+    @Test
+    public void childFullName_ReturnsEx1_WhenSuccessful() {
+        JpaExampleSpecification specification = JpaExampleSpecification.builder()
                 .childFullName("Alex")
+                .build();
+        JpaExampleProjection projection = jpaExampleRepository
+                .findOneProjectedBy(JpaExampleProjection.class, specification)
+                .get();
+        Assertions.assertThat(projection.getId())
+                .isEqualTo(1L);
+        Assertions.assertThat(projection.getName())
+                .isEqualTo("Ex1");
+        Assertions.assertThat(projection.getChildId())
+                .isEqualTo(1L);
+        Assertions.assertThat(projection.getChildName())
+                .isEqualTo("Alex");
+    }
+
+    @Test
+    public void childName_ReturnsEx1_WhenSuccessful() {
+        JpaExampleSpecification specification = JpaExampleSpecification.builder()
+                .childName("Alex")
                 .build();
         JpaExampleProjection projection = jpaExampleRepository
                 .findOneProjectedBy(JpaExampleProjection.class, specification)

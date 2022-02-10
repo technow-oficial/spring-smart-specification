@@ -116,4 +116,21 @@ public class ReflectionUtils {
         }
     }
 
+    public static Object getFieldValue(Object domain, List<String> path) {
+        Object result = domain;
+        for (String current : path) {
+            try {
+                if (result == null) {
+                    return null;
+                }
+                Field field = getPropField(result.getClass(), current);
+                field.setAccessible(true);
+                result = field.get(result);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new ReflectionException(e);
+            }
+        }
+        return result;
+    }
+
 }
