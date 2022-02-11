@@ -103,9 +103,9 @@ jpaExampleRepository.findAllProjectedBy(JpaExampleProjection.class, specificatio
 
 # Maven
 ```maven
-<dependecy>
+<dependency>
   <groupId>io.github.technow-oficial</groupId>
   <artifactId>spring-smart-specification</artifactId>
   <version>1.0.1</version>
-</dependecy>
+</dependency>
 ```
