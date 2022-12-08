@@ -68,6 +68,9 @@ public class ReflectionUtils {
                 }
             }
         }
+        if (domainClass.getSuperclass() != null && !Object.class.equals(domainClass.getSuperclass())) {
+            fields.addAll(listPropFields(domainClass.getSuperclass()));
+        }
         fields.sort((a, b) -> {
             return a.getName().length() - b.getName().length();
         });
